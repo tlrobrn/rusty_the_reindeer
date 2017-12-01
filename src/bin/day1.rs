@@ -8,15 +8,15 @@ fn main() {
     println!("Part 2: {}", solve_captcha2(&digits));
 }
 
-fn solve_captcha1(digits: &Vec<u32>) -> u32 {
+fn solve_captcha1(digits: &[u32]) -> u32 {
     solve_captcha(digits, 1)
 }
 
-fn solve_captcha2(digits: &Vec<u32>) -> u32 {
+fn solve_captcha2(digits: &[u32]) -> u32 {
     solve_captcha(digits, digits.len() / 2)
 }
 
-fn solve_captcha(digits: &Vec<u32>, step: usize) -> u32 {
+fn solve_captcha(digits: &[u32], step: usize) -> u32 {
     let length = digits.len();
 
     digits.iter().enumerate().fold(0, |total, (i, &n)| {
