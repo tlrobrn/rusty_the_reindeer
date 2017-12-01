@@ -3,30 +3,24 @@ extern crate rusty_the_reindeer;
 fn main() {
     let contents = rusty_the_reindeer::get_input()
         .expect("Must provide valid input path");
-    println!("Part 1: {}", solve_captcha(&contents));
+
+    println!("Part 1: {}", solve_captcha1(&contents));
     println!("Part 2: {}", solve_captcha2(&contents));
 }
 
-fn solve_captcha(contents: &str) -> u32 {
-    let mut digits = to_digits(contents);
-
-    let first = digits[0];
-    digits.push(first);
-
-    digits.windows(2).fold(0, |total, numbers| {
-        if numbers[0] == numbers[1] {
-            total + numbers[0]
-        } else {
-            total
-        }
-    })
+fn solve_captcha1(contents: &str) -> u32 {
+    let digits = to_digits(contents);
+    let length = digits.len();
+    solve_captcha(digits, length, 1)
 }
 
 fn solve_captcha2(contents: &str) -> u32 {
     let digits = to_digits(contents);
     let length = digits.len();
-    let step = length / 2;
+    solve_captcha(digits, length, length / 2)
+}
 
+fn solve_captcha(digits: Vec<u32>, length: usize, step: usize) -> u32 {
     digits
         .iter()
         .enumerate()
@@ -59,10 +53,10 @@ mod day1_tests {
 
     #[test]
     fn solve_captcha_works() {
-        assert_eq!(3, solve_captcha("1122"));
-        assert_eq!(4, solve_captcha("1111"));
-        assert_eq!(0, solve_captcha("1234"));
-        assert_eq!(9, solve_captcha("91212129"));
+        assert_eq!(3, solve_captcha1("1122"));
+        assert_eq!(4, solve_captcha1("1111"));
+        assert_eq!(0, solve_captcha1("1234"));
+        assert_eq!(9, solve_captcha1("91212129"));
     }
 
     #[test]
