@@ -1,0 +1,6 @@
+[package]
+name = "rusty_the_reindeer"
+version = "0.1.0"
+authors = ["tlrobrn <obrien.taylorm@gmail.com>"]
+
+[dependencies]
