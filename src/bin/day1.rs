@@ -20,12 +20,7 @@ fn solve_captcha(digits: &[u32], step: usize) -> u32 {
     let length = digits.len();
 
     digits.iter().enumerate().fold(0, |total, (i, &n)| {
-        let lookup = if i + step < length {
-            i + step
-        } else {
-            i + step - length
-        };
-
+        let lookup = (i + step) % length;
         if n == digits[lookup] {
             total + n
         } else {
