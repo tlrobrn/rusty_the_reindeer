@@ -56,8 +56,8 @@ fn divided_result(line: &str) -> u64 {
         .map(|word| u64::from_str(word).unwrap())
         .collect();
 
-    for number in &numbers {
-        if let Some(n) = numbers.iter().find(|&x| x != number && (number % x == 0 || x % number == 0)) {
+    for (i, number) in numbers.iter().enumerate() {
+        if let Some(n) = numbers[(i+1)..].iter().find(|&x| number % x == 0 || x % number == 0) {
             return (number / n).max(n / number);
         }
     }
