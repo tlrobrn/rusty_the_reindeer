@@ -22,11 +22,9 @@ fn escape(contents: &str, cutoff: i64) -> usize {
 
     while position < offsets.len() {
         let offset = offsets[position];
-        if offset <= cutoff {
-            offsets[position] = offset + 1;
-        } else {
-            offsets[position] = offset - 1;
-        }
+        let delta = if offset <= cutoff { 1 } else { -1 };
+
+        offsets[position] = offset + delta;
         position = (position as i64 + offset) as usize;
         jumps += 1;
     }
