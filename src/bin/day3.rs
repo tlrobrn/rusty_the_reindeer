@@ -29,7 +29,7 @@ fn step_counter(contents: &str) -> i64 {
             (x, y) if x == ring && y == ring  => (ring - 1, ring),
             (x, y) if x == -ring && y == ring => (-ring, ring - 1),
             (x, y) if x == -ring && y == -ring => (-ring + 1, -ring),
-            (x, y) if x == ring && y == -ring => (ring, -ring + 1),
+            (x, y) if x == ring && y == -ring => (ring + 1, -ring),
             (x, y) if x == ring => (x, y + 1),
             (x, y) if y == ring => (x - 1, y),
             (x, y) if x == -ring => (x, y - 1),
