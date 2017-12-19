@@ -6,8 +6,10 @@ use std::str::FromStr;
 fn main() {
     let contents = rusty_the_reindeer::get_input().expect("Must provide valid input path");
     let part1 = max_value(&contents);
+    let part2 = max_value_during_processing(&contents);
 
     println!("Part 1: {}", part1);
+    println!("Part 2: {}", part2);
 }
 
 fn max_value(contents: &str) -> i64 {
@@ -17,6 +19,14 @@ fn max_value(contents: &str) -> i64 {
     }
 
     registers.max_value()
+}
+
+fn max_value_during_processing(contents: &str) -> i64 {
+    let mut registers = Registers::default();
+    contents.lines().map(|line| {
+        registers.execute(&Command::parse(line));
+        registers.max_value()
+    }).max().unwrap()
 }
 
 enum Instruction<'a> {
@@ -151,5 +161,15 @@ c dec -10 if a >= 1
 c inc -20 if c == 10";
 
         assert_eq!(1, max_value(input));
+    }
+
+    #[test]
+    fn part2() {
+        let input = "b inc 5 if a > 1
+a inc 1 if b < 5
+c dec -10 if a >= 1
+c inc -20 if c == 10";
+
+        assert_eq!(10, max_value_during_processing(input));
     }
 }
