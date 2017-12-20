@@ -12,43 +12,28 @@ fn main() {
 
 fn score(contents: &str) -> (u64, u64) {
     let mut chars = contents.chars();
-    score_loop(&mut chars, 0, 0)
+    score_loop(&mut chars, 0, 0, 0)
 }
 
-fn score_loop(chars: &mut Chars, score: u64, count: u64) -> (u64, u64) {
+fn score_loop(chars: &mut Chars, depth: u64, score: u64, count: u64) -> (u64, u64) {
     match chars.next() {
         None => (score, count),
-        Some('{') => score_group(chars, score, count, 0),
-        Some('<') => {
-            let count = collect_garbage(chars, count);
-            score_loop(chars, score, count)
-        },
-        _ => score_loop(chars, score, count),
+        Some('{') => score_loop(chars, depth + 1, score, count),
+        Some('}') if depth > 0 => score_loop(chars, depth - 1, score + depth, count),
+        Some('<') => count_garbage(chars, depth, score, count),
+        _ => score_loop(chars, depth, score, count),
     }
 }
 
-fn score_group(chars: &mut Chars, score: u64, count: u64, depth: u64) -> (u64, u64) {
+fn count_garbage(chars: &mut Chars, depth: u64, score: u64, count: u64) -> (u64, u64) {
     match chars.next() {
         None => (score, count),
-        Some('}') if depth > 0 => score_group(chars, score + depth + 1, count, depth - 1),
-        Some('}') => score_loop(chars, score + 1, count),
-        Some('{') => score_group(chars, score, count, depth + 1),
-        Some('<') => {
-            let count = collect_garbage(chars, count);
-            score_group(chars, score, count, depth)
-        },
-        _ => score_group(chars, score, count, depth),
-    }
-}
-
-fn collect_garbage(chars: &mut Chars, count: u64) -> u64 {
-    match chars.next() {
-        None | Some('>') => count,
         Some('!') => {
             chars.next();
-            collect_garbage(chars, count)
+            count_garbage(chars, depth, score, count)
         },
-        _ => collect_garbage(chars, count + 1),
+        Some('>') => score_loop(chars, depth, score, count),
+        _ => count_garbage(chars, depth, score, count + 1),
     }
 }
 
