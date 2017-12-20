@@ -29,7 +29,8 @@ fn score_loop(chars: &mut Chars, score: u64) -> u64 {
 fn score_group(chars: &mut Chars, score: u64, depth: u64) -> u64 {
     match chars.next() {
         None => score,
-        Some('}') => if depth > 0 { score_group(chars, score + depth + 1, depth - 1) } else { score_loop(chars, score + 1) },
+        Some('}') if depth > 0 => score_group(chars, score + depth + 1, depth - 1),
+        Some('}') => score_loop(chars, score + 1),
         Some('{') => score_group(chars, score, depth + 1),
         Some('<') => {
             collect_garbage(chars);
@@ -41,8 +42,7 @@ fn score_group(chars: &mut Chars, score: u64, depth: u64) -> u64 {
 
 fn collect_garbage(chars: &mut Chars) {
     match chars.next() {
-        None => (),
-        Some('>') => (),
+        None | Some('>') => (),
         Some('!') => {
             chars.next();
             collect_garbage(chars)
