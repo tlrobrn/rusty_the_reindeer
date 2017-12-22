@@ -22,7 +22,7 @@ fn count_groups(contents: &str) -> usize {
     
     graph.nodes().fold(0, |total, node| {
         if !seen.contains(&node) {
-            for &node in graph.group(node).iter() {
+            for &node in &graph.group(node) {
                 seen.insert(node);
             }
             total + 1
