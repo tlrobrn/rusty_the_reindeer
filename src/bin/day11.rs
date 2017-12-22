@@ -7,8 +7,21 @@ fn main() {
     println!("Part 1: {}", part1);
 }
 
-fn steps(_contents: &str) -> u64 {
-    0
+fn steps(contents: &str) -> u64 {
+    let (x, y, z): (i64, i64, i64) = contents.split(',')
+        .fold((0, 0, 0), |(x, y, z), direction| {
+            match direction {
+                "n" => (x, y + 1, z - 1),
+                "ne" => (x + 1, y, z - 1),
+                "se" => (x + 1, y - 1, z),
+                "s" => (x, y - 1, z + 1),
+                "sw" => (x - 1, y, z + 1),
+                "nw" => (x - 1, y + 1, z),
+                _ => (x, y, z),
+            }
+        });
+
+    x.abs().max(y.abs()).max(z.abs()) as u64
 }
 
 #[cfg(test)]
