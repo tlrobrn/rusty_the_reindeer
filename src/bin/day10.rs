@@ -71,7 +71,7 @@ impl KnotHash {
 
     pub fn dense(&self) -> String {
         let mut bytes = self.list.iter();
-        let mut dense_hash = vec![0; 16];
+        let mut dense_hash = [0; 16];
 
         for block in &mut dense_hash {
             *block = *bytes.next().unwrap();
