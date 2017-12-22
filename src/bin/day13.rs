@@ -6,12 +6,32 @@ use std::str::FromStr;
 fn main() {
     let contents = rusty_the_reindeer::get_input().expect("Must provide valid input path");
     let part1 = severity(contents.trim());
+    let part2 = delay(contents.trim());
 
     println!("Part 1: {}", part1);
+    println!("Part 2: {}", part2);
 }
 
 fn severity(contents: &str) -> usize {
     let mut firewall = Firewall::parse(contents);
+    traverse_firewall(&mut firewall)
+}
+
+fn delay(contents: &str) -> usize {
+    let firewall = Firewall::parse(contents);
+    let mut delay = 1;
+    loop {
+        let safe = firewall.range().all(|layer| {
+            let time = layer + delay;
+            firewall.scanner(layer).map_or(true, |scanner| scanner.look_ahead(time) != 0)
+        });
+
+        if safe { return delay; }
+        delay += 1;
+    }
+}
+
+fn traverse_firewall(firewall: &mut Firewall) -> usize {
     firewall.range().fold(0, |mut total, layer| {
         if let Some(scanner) = firewall.scanner(layer) {
             if scanner.position == 0 {
@@ -44,6 +64,10 @@ impl Scanner {
         if self.position == self.range - 1 || self.position == 0 {
             self.step = -self.step;
         }
+    }
+
+    pub fn look_ahead(&self, steps: usize) -> usize {
+        steps % ((self.range - 1) * 2)
     }
 }
 
@@ -92,5 +116,14 @@ mod day13_tests {
 4: 4
 6: 4";
         assert_eq!(24, severity(input));
+    }
+
+    #[test]
+    fn part2() {
+        let input = "0: 3
+1: 2
+4: 4
+6: 4";
+        assert_eq!(10, delay(input));
     }
 }
