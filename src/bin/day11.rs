@@ -20,7 +20,8 @@ fn max_steps(contents: &str) -> u64 {
 }
 
 fn build_path(contents: &str) -> Vec<Coordinate> {
-    contents.split(',')
+    contents
+        .split(',')
         .fold(vec![(0, 0, 0)], |mut positions, direction| {
             let &(x, y, z) = positions.last().unwrap();
 

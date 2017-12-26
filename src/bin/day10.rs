@@ -13,7 +13,10 @@ fn main() {
 }
 
 fn once(contents: &str) -> u64 {
-    let input: Vec<u8> = contents.split(',').map(|s| u8::from_str(s).unwrap()).collect();
+    let input: Vec<u8> = contents
+        .split(',')
+        .map(|s| u8::from_str(s).unwrap())
+        .collect();
     KnotHash::default().round(&input).head()
 }
 
@@ -21,14 +24,16 @@ fn hash(contents: &str) -> String {
     KnotHash::new(contents).dense()
 }
 
-
 #[cfg(test)]
 mod day10_tests {
     use super::*;
 
     #[test]
     fn part1() {
-        assert_eq!(52070, once("46,41,212,83,1,255,157,65,139,52,39,254,2,86,0,204"));
+        assert_eq!(
+            52070,
+            once("46,41,212,83,1,255,157,65,139,52,39,254,2,86,0,204")
+        );
     }
 
     #[test]

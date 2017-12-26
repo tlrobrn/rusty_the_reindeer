@@ -23,10 +23,14 @@ fn delay(contents: &str) -> usize {
     loop {
         let safe = firewall.range().all(|layer| {
             let time = layer + delay;
-            firewall.scanner(layer).map_or(true, |scanner| scanner.look_ahead(time) != 0)
+            firewall
+                .scanner(layer)
+                .map_or(true, |scanner| scanner.look_ahead(time) != 0)
         });
 
-        if safe { return delay; }
+        if safe {
+            return delay;
+        }
         delay += 1;
     }
 }

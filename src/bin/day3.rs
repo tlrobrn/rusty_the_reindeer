@@ -14,7 +14,9 @@ fn main() {
 
 fn step_counter(contents: &str) -> i64 {
     let number = i64::from_str(contents).unwrap();
-    if number == 1 { return 0; }
+    if number == 1 {
+        return 0;
+    }
 
     let ring = ring_of(number);
     let mut coords = starting_coords_of(ring);
@@ -26,7 +28,7 @@ fn step_counter(contents: &str) -> i64 {
         }
 
         coords = match coords {
-            (x, y) if x == ring && y == ring  => (ring - 1, ring),
+            (x, y) if x == ring && y == ring => (ring - 1, ring),
             (x, y) if x == -ring && y == ring => (-ring, ring - 1),
             (x, y) if x == -ring && y == -ring => (-ring + 1, -ring),
             (x, y) if x == ring && y == -ring => (ring + 1, -ring),
@@ -81,14 +83,14 @@ fn stress_test(contents: &str) -> u64 {
         }
 
         if let Some(coordinate) = next_coordinate(spiral.last_coordinate()) {
-            let value = neighbors(coordinate).iter()
-                .fold(0, |total, coordinate| total + spiral.get_by_coordinate(coordinate).unwrap_or(&0));
+            let value = neighbors(coordinate).iter().fold(0, |total, coordinate| {
+                total + spiral.get_by_coordinate(coordinate).unwrap_or(&0)
+            });
 
             spiral.push(value);
         }
     }
 }
-
 
 mod spiral {
     use std::collections::HashMap;
@@ -102,7 +104,7 @@ mod spiral {
         coordinate_map: HashMap<Coordinate, usize>,
     }
 
-    impl <T> Spiral<T> {
+    impl<T> Spiral<T> {
         pub fn push(&mut self, value: T) -> Coordinate {
             let coordinate = next_coordinate(self.last_coordinate).unwrap();
 
@@ -122,7 +124,9 @@ mod spiral {
         }
 
         pub fn get_by_coordinate(&self, coordinate: &Coordinate) -> Option<&T> {
-            self.coordinate_map.get(coordinate).and_then(|&index| self.get_by_index(index))
+            self.coordinate_map
+                .get(coordinate)
+                .and_then(|&index| self.get_by_index(index))
         }
 
         pub fn last_coordinate(&self) -> Option<Coordinate> {
@@ -141,7 +145,7 @@ mod spiral {
                 let boundary = x.abs().max(y.abs());
                 match (x, y) {
                     (0, 0) => Some((1, 0)),
-                    (a, b) if a == boundary && b == boundary  => Some((boundary - 1, boundary)),
+                    (a, b) if a == boundary && b == boundary => Some((boundary - 1, boundary)),
                     (a, b) if a == -boundary && b == boundary => Some((-boundary, boundary - 1)),
                     (a, b) if a == -boundary && b == -boundary => Some((-boundary + 1, -boundary)),
                     (a, b) if a == boundary && b == -boundary => Some((boundary + 1, -boundary)),
@@ -149,9 +153,9 @@ mod spiral {
                     (a, b) if b == boundary => Some((a - 1, b)),
                     (a, b) if a == -boundary => Some((a, b - 1)),
                     (a, b) if b == -boundary => Some((a + 1, b)),
-                    _ => None
+                    _ => None,
                 }
-            },
+            }
         }
     }
 
@@ -212,9 +216,14 @@ mod spiral {
         #[test]
         fn test_neighbors() {
             let mut expected = vec![
-                (-1, 1),  (0, 1),  (1, 1),
-                (-1, 0),           (1, 0),
-                (-1, -1), (0, -1), (1, -1),
+                (-1, 1),
+                (0, 1),
+                (1, 1),
+                (-1, 0),
+                (1, 0),
+                (-1, -1),
+                (0, -1),
+                (1, -1),
             ];
             expected.sort();
 
@@ -225,7 +234,6 @@ mod spiral {
         }
     }
 }
-
 
 #[cfg(test)]
 mod day3_tests {

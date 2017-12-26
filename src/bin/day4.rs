@@ -28,11 +28,14 @@ fn is_valid(line: &&str) -> bool {
 }
 
 fn is_valid2(line: &&str) -> bool {
-    let sorted_chars: Vec<String> = line.split_whitespace().map(|word| {
-        let mut chars: Vec<char> = word.chars().collect();
-        chars.sort();
-        chars
-    }).map(String::from_iter).collect();
+    let sorted_chars: Vec<String> = line.split_whitespace()
+        .map(|word| {
+            let mut chars: Vec<char> = word.chars().collect();
+            chars.sort();
+            chars
+        })
+        .map(String::from_iter)
+        .collect();
 
     let unique_word_count = HashSet::<&String>::from_iter(sorted_chars.iter()).len();
     let word_count = sorted_chars.len();

@@ -13,7 +13,8 @@ fn main() {
 }
 
 fn reallocate(contents: &str) -> (usize, usize) {
-    let mut banks: Vec<usize> = contents.trim()
+    let mut banks: Vec<usize> = contents
+        .trim()
         .split_whitespace()
         .map(|word| usize::from_str(word).unwrap())
         .collect();
@@ -24,11 +25,14 @@ fn reallocate(contents: &str) -> (usize, usize) {
     redistribute(&mut banks, &mut seen, 1)
 }
 
-fn redistribute(banks: &mut[usize], seen: &mut HashMap<Vec<usize>, usize>, step: usize) -> (usize, usize) {
+fn redistribute(
+    banks: &mut [usize],
+    seen: &mut HashMap<Vec<usize>, usize>,
+    step: usize,
+) -> (usize, usize) {
     let length = banks.len();
-    let sorted_banks: BinaryHeap<(usize, usize, usize)> = BinaryHeap::from_iter(
-        banks.iter().enumerate().map(|(i, &v)| (v, length - i, i))
-    );
+    let sorted_banks: BinaryHeap<(usize, usize, usize)> =
+        BinaryHeap::from_iter(banks.iter().enumerate().map(|(i, &v)| (v, length - i, i)));
 
     let &(blocks, _, index) = sorted_banks.peek().unwrap();
     banks[index] = 0;

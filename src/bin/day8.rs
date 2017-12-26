@@ -1,6 +1,6 @@
 extern crate rusty_the_reindeer;
 
-use std::collections::{HashMap};
+use std::collections::HashMap;
 use std::str::FromStr;
 
 fn main() {
@@ -23,10 +23,14 @@ fn max_value(contents: &str) -> i64 {
 
 fn max_value_during_processing(contents: &str) -> i64 {
     let mut registers = Registers::default();
-    contents.lines().map(|line| {
-        registers.execute(&Command::parse(line));
-        registers.max_value()
-    }).max().unwrap()
+    contents
+        .lines()
+        .map(|line| {
+            registers.execute(&Command::parse(line));
+            registers.max_value()
+        })
+        .max()
+        .unwrap()
 }
 
 enum Instruction<'a> {
@@ -48,9 +52,9 @@ struct Command<'a> {
     guard: Option<Guard<'a>>,
 }
 
-impl <'a> Command<'a> {
+impl<'a> Command<'a> {
     pub fn parse(line: &'a str) -> Self {
-        let parts:Vec<&str> = line.split(" if ").collect();
+        let parts: Vec<&str> = line.split(" if ").collect();
         Self {
             instruction: Self::parse_instruction(parts[0]),
             guard: Self::parse_guard(parts.get(1)),
@@ -97,7 +101,7 @@ struct Registers<'a> {
     registers: HashMap<&'a str, i64>,
 }
 
-impl <'a> Registers<'a> {
+impl<'a> Registers<'a> {
     pub fn execute(&mut self, command: &Command<'a>) {
         if self.evaluate_guard(&command.guard) {
             self.evaluate_instruction(&command.instruction);
@@ -113,27 +117,27 @@ impl <'a> Registers<'a> {
             Some(Guard::LT { register, value }) => {
                 let entry = self.registers.entry(register).or_insert(0);
                 *entry < value
-            },
+            }
             Some(Guard::LE { register, value }) => {
                 let entry = self.registers.entry(register).or_insert(0);
                 *entry <= value
-            },
+            }
             Some(Guard::EQ { register, value }) => {
                 let entry = self.registers.entry(register).or_insert(0);
                 *entry == value
-            },
+            }
             Some(Guard::NE { register, value }) => {
                 let entry = self.registers.entry(register).or_insert(0);
                 *entry != value
-            },
+            }
             Some(Guard::GE { register, value }) => {
                 let entry = self.registers.entry(register).or_insert(0);
                 *entry >= value
-            },
+            }
             Some(Guard::GT { register, value }) => {
                 let entry = self.registers.entry(register).or_insert(0);
                 *entry > value
-            },
+            }
             None => true,
         }
     }

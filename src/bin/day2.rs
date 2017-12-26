@@ -15,14 +15,13 @@ fn checksum(contents: &str) -> u64 {
     contents
         .lines()
         .map(min_max)
-        .fold(0, |total, mm| total + (mm.max - mm.min))
+        .fold(0, |total, mm| {
+            total + (mm.max - mm.min)
+        })
 }
 
 fn checksum2(contents: &str) -> u64 {
-    contents
-        .lines()
-        .map(divided_result)
-        .sum()
+    contents.lines().map(divided_result).sum()
 }
 
 #[derive(Debug)]
@@ -51,13 +50,15 @@ fn min_max(line: &str) -> MinMax {
 }
 
 fn divided_result(line: &str) -> u64 {
-    let numbers: Vec<u64> = line
-        .split_whitespace()
+    let numbers: Vec<u64> = line.split_whitespace()
         .map(|word| u64::from_str(word).unwrap())
         .collect();
 
     for (i, number) in numbers.iter().enumerate() {
-        if let Some(n) = numbers[(i+1)..].iter().find(|&x| number % x == 0 || x % number == 0) {
+        if let Some(n) = numbers[(i + 1)..]
+            .iter()
+            .find(|&x| number % x == 0 || x % number == 0)
+        {
             return (number / n).max(n / number);
         }
     }

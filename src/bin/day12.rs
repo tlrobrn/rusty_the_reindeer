@@ -19,15 +19,14 @@ fn count(contents: &str) -> usize {
 fn count_groups(contents: &str) -> usize {
     let mut seen = HashSet::new();
     let graph = Graph::parse(contents);
-    
+
     graph.nodes().fold(0, |total, node| {
         if !seen.contains(&node) {
             for &node in &graph.group(node) {
                 seen.insert(node);
             }
             total + 1
-        }
-        else {
+        } else {
             total
         }
     })

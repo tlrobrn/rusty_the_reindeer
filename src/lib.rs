@@ -45,7 +45,12 @@ impl KnotHash {
     const SUFFIX: [u8; 5] = [17, 31, 73, 47, 23];
 
     pub fn new(input: &str) -> Self {
-        let input: Vec<u8> = input.as_bytes().iter().chain(Self::SUFFIX.iter()).cloned().collect();
+        let input: Vec<u8> = input
+            .as_bytes()
+            .iter()
+            .chain(Self::SUFFIX.iter())
+            .cloned()
+            .collect();
 
         let mut knot_hash = Self::default();
         for _ in 0..64 {
@@ -93,7 +98,8 @@ impl KnotHash {
         }
         values.reverse();
 
-        values.iter()
+        values
+            .iter()
             .enumerate()
             .map(|(offset, &value)| ((position + offset) % 256, value))
             .for_each(|(index, value)| self.list[index] = value);

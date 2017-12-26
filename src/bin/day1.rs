@@ -33,7 +33,6 @@ fn to_digits(contents: &str) -> Vec<u32> {
     contents.chars().map(|c| c.to_digit(10).unwrap()).collect()
 }
 
-
 #[cfg(test)]
 mod day1_tests {
     use super::*;
