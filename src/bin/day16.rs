@@ -8,22 +8,32 @@ const LETTERS: &str = "abcdefghijklmnopqrstuvwxyz";
 
 fn main() {
     let contents = rusty_the_reindeer::get_input().expect("Must provide valid input path");
-    let part1 = dance(contents.trim(), 16);
+    let part1 = dance(contents.trim(), 16, 1);
+    let part2 = dance(contents.trim(), 16, 1_000_000_000);
 
     println!("Part 1: {}", part1);
+    println!("Part 2: {}", part2);
 }
 
-fn dance(contents: &str, len: usize) -> String {
-    let instructions = contents.split(',');
+fn dance(contents: &str, len: usize, count: usize) -> String {
+    let instructions: Vec<_> = contents.split(',').collect();
     let mut dancers = characters(len);
+    let mut positions = vec![String::from_iter(dancers.iter())];
 
-    for instruction in instructions {
-        spin(&mut dancers, instruction);
-        exchange(&mut dancers, instruction);
-        partner(&mut dancers, instruction);
+    for _ in 0..count {
+        for instruction in &instructions {
+            spin(&mut dancers, instruction);
+            exchange(&mut dancers, instruction);
+            partner(&mut dancers, instruction);
+        }
+        let position = String::from_iter(dancers.iter());
+        if positions.iter().any(|p| **p == position) {
+            return positions[count % positions.len()].clone();
+        }
+        positions.push(position);
     }
 
-    String::from_iter(dancers.iter())
+    positions.last().unwrap().clone()
 }
 
 fn characters(len: usize) -> Vec<char> {
@@ -68,7 +78,7 @@ mod day16_tests {
     #[test]
     fn part1() {
         let input = "s1,x3/4,pe/b";
-        assert_eq!("baedc", dance(input, 5));
+        assert_eq!("baedc", dance(input, 5, 1));
     }
 
     #[test]
