@@ -5,27 +5,18 @@ use std::str::FromStr;
 fn main() {
     let contents = rusty_the_reindeer::get_input().expect("Must provide valid input path");
     let part1 = count(contents.trim());
+    let part2 = picky_count(contents.trim());
 
     println!("Part 1: {}", part1);
+    println!("Part 2: {}", part2);
 }
 
 fn count(contents: &str) -> usize {
-    let factors = [16_807, 48_271];
-    let seeds = contents.lines().map(|line| {
-        line.split_whitespace()
-            .last()
-            .and_then(|word| usize::from_str(word).ok())
-            .unwrap()
-    });
-    let mut generators: Vec<Generator> = factors
-        .iter()
-        .zip(seeds)
-        .map(|(&factor, seed)| Generator::new(factor, seed))
-        .collect();
+    let mut generators = seed_generators(contents);
     (0..40_000_001).fold(0, |total, _| {
         let mut values = generators
             .iter_mut()
-            .map(|g| g.next_value())
+            .map(|g| g.next().unwrap())
             .map(lowest_16_bits);
         if values.next() == values.next() {
             total + 1
@@ -33,6 +24,44 @@ fn count(contents: &str) -> usize {
             total
         }
     })
+}
+
+fn picky_count(contents: &str) -> usize {
+    let mut seeds = contents.lines().map(|line| {
+        line.split_whitespace()
+            .last()
+            .and_then(|word| usize::from_str(word).ok())
+            .unwrap()
+    });
+
+    let mut generator_a = Generator::new(16_807, seeds.next().unwrap()).filter(|x| x % 4 == 0);
+    let mut generator_b = Generator::new(48_271, seeds.next().unwrap()).filter(|x| x % 8 == 0);
+
+    (0..5_000_001).fold(0, |total, _| {
+        let a = lowest_16_bits(generator_a.next().unwrap());
+        let b = lowest_16_bits(generator_b.next().unwrap());
+        if a == b {
+            total + 1
+        } else {
+            total
+        }
+    })
+}
+
+fn seed_generators(contents: &str) -> Vec<Generator> {
+    let factors = [16_807, 48_271];
+    let seeds = contents.lines().map(|line| {
+        line.split_whitespace()
+            .last()
+            .and_then(|word| usize::from_str(word).ok())
+            .unwrap()
+    });
+
+    factors
+        .iter()
+        .zip(seeds)
+        .map(|(&factor, seed)| Generator::new(factor, seed))
+        .collect()
 }
 
 fn lowest_16_bits(n: usize) -> u16 {
@@ -54,10 +83,14 @@ impl Generator {
             value: seed,
         }
     }
+}
 
-    pub fn next_value(&mut self) -> usize {
+impl Iterator for Generator {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
         self.value = (self.value * self.factor) % Self::DIVISOR;
-        self.value
+        Some(self.value)
     }
 }
 
@@ -69,5 +102,11 @@ mod day15_tests {
     fn part1() {
         let input = "65\n8921";
         assert_eq!(588, count(input));
+    }
+
+    #[test]
+    fn part2() {
+        let input = "65\n8921";
+        assert_eq!(309, picky_count(input));
     }
 }
