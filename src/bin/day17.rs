@@ -26,7 +26,7 @@ fn spin(contents: &str) -> usize {
 
 fn spin_zero(contents: &str) -> usize {
     let step = usize::from_str(contents).unwrap();
-    (1..50_000_000)
+    (1..50_000_001)
         .fold(
             (0, 0, 0),
             |(last_insert_position, zero_position, value_after_zero), x| {
