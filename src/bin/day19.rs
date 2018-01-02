@@ -8,17 +8,28 @@ fn main() {
     let contents = rusty_the_reindeer::get_input().expect("Must provide valid input path");
     let part1 = trace(&contents);
     println!("Part 1: {}", part1);
+    let part2 = count(&contents);
+    println!("Part 2: {}", part2);
 }
 
 fn trace(contents: &str) -> String {
-    String::from_iter(Path::from_str(contents).unwrap().trace())
+    String::from_iter(
+        Path::from_str(contents)
+            .unwrap()
+            .trace()
+            .filter(|c| c.is_alphanumeric()),
+    )
+}
+
+fn count(contents: &str) -> usize {
+    Path::from_str(contents).unwrap().trace().count() + 1
 }
 
 type Coordinates = (usize, usize);
 
 struct Node {
     coordinates: Coordinates,
-    data: Option<char>,
+    data: char,
 }
 
 impl Node {
@@ -72,15 +83,7 @@ impl FromStr for Path {
             .enumerate()
             .flat_map(|(y, line)| line.chars().enumerate().map(move |(x, c)| ((x, y), c)))
             .filter(|&(_coordinates, data)| !data.is_whitespace())
-            .map(|(coordinates, data)| {
-                let data = if data.is_alphanumeric() {
-                    Some(data)
-                } else {
-                    None
-                };
-
-                (coordinates, Node { coordinates, data })
-            });
+            .map(|(coordinates, data)| (coordinates, Node { coordinates, data }));
 
         Ok(Self {
             nodes: HashMap::from_iter(nodes),
@@ -132,7 +135,7 @@ impl<'a> Iterator for Trace<'a> {
                             Some(node) => {
                                 self.attempts = 0;
                                 self.current_node = node;
-                                node.data.or_else(|| self.next())
+                                Some(node.data)
                             }
                             None => {
                                 self.direction = Direction::East;
@@ -153,7 +156,7 @@ impl<'a> Iterator for Trace<'a> {
                             Some(node) => {
                                 self.attempts = 0;
                                 self.current_node = node;
-                                node.data.or_else(|| self.next())
+                                Some(node.data)
                             }
                             None => {
                                 self.direction = Direction::West;
@@ -174,7 +177,7 @@ impl<'a> Iterator for Trace<'a> {
                             Some(node) => {
                                 self.attempts = 0;
                                 self.current_node = node;
-                                node.data.or_else(|| self.next())
+                                Some(node.data)
                             }
                             None => {
                                 self.direction = Direction::South;
@@ -195,7 +198,7 @@ impl<'a> Iterator for Trace<'a> {
                             Some(node) => {
                                 self.attempts = 0;
                                 self.current_node = node;
-                                node.data.or_else(|| self.next())
+                                Some(node.data)
                             }
                             None => {
                                 self.direction = Direction::North;
@@ -224,5 +227,17 @@ mod day19_tests {
      +B-+  +--+ 
 ";
         assert_eq!("ABCDEF", trace(input));
+    }
+
+    #[test]
+    fn part2() {
+        let input = "     |          
+     |  +--+    
+     A  |  C    
+ F---|----E|--+ 
+     |  |  |  D 
+     +B-+  +--+ 
+";
+        assert_eq!(38, count(input));
     }
 }
