@@ -52,7 +52,7 @@ fn process_with_context(instructions: &[Instruction], registers: Registers) -> P
     Process {
         registers,
         instructions,
-        position: 0
+        position: 0,
     }
 }
 
