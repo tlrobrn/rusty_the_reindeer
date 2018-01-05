@@ -1,11 +1,13 @@
 extern crate rusty_the_reindeer;
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 fn main() {
     let contents = rusty_the_reindeer::get_input().expect("Must provide valid input path");
     let part1 = count_infected(&contents, 10_000);
     println!("Part 1: {}", part1);
+    let part2 = count_infected_advanced(&contents, 10_000_000);
+    println!("Part 2: {}", part2);
 }
 
 fn count_infected(contents: &str, bursts: usize) -> usize {
@@ -48,7 +50,68 @@ fn parse_contents(contents: &str) -> (HashSet<Coordinate>, Virus) {
     )
 }
 
+fn count_infected_advanced(contents: &str, bursts: usize) -> usize {
+    use Status::*;
+
+    let (mut grid, mut virus) = parse_contents_advanced(contents);
+
+    (0..bursts).fold(0, |total, _| match grid.get(&virus.position) {
+        None | Some(&Clean) => {
+            virus.direction = virus.direction.turn_left();
+            grid.insert(virus.position, Weakened);
+            virus.move_forward();
+            total
+        }
+        Some(&Weakened) => {
+            grid.insert(virus.position, Infected);
+            virus.move_forward();
+            total + 1
+        }
+        Some(&Infected) => {
+            virus.direction = virus.direction.turn_right();
+            grid.insert(virus.position, Flagged);
+            virus.move_forward();
+            total
+        }
+        Some(&Flagged) => {
+            virus.direction = virus.direction.reverse();
+            grid.insert(virus.position, Clean);
+            virus.move_forward();
+            total
+        }
+    })
+}
+
+fn parse_contents_advanced(contents: &str) -> (HashMap<Coordinate, Status>, Virus) {
+    let mut grid = HashMap::new();
+    for (y, line) in contents.lines().enumerate() {
+        for (x, node) in line.chars().enumerate() {
+            if node == '#' {
+                grid.insert((x as i64, -(y as i64)), Status::Infected);
+            }
+        }
+    }
+
+    let center_y = -((contents.lines().count() / 2) as i64);
+    let center_x = (contents.lines().next().unwrap().len() / 2) as i64;
+
+    (
+        grid,
+        Virus {
+            position: (center_x, center_y),
+            direction: Direction::North,
+        },
+    )
+}
+
 type Coordinate = (i64, i64);
+
+enum Status {
+    Clean,
+    Weakened,
+    Infected,
+    Flagged,
+}
 
 enum Direction {
     North,
@@ -75,6 +138,16 @@ impl Direction {
             South => East,
             East => North,
             West => South,
+        }
+    }
+
+    pub fn reverse(&self) -> Self {
+        use Direction::*;
+        match *self {
+            North => South,
+            South => North,
+            East => West,
+            West => East,
         }
     }
 }
@@ -111,5 +184,15 @@ mod day22_tests {
         assert_eq!(5, count_infected(input, 7));
         assert_eq!(41, count_infected(input, 70));
         assert_eq!(5587, count_infected(input, 10_000));
+    }
+
+    #[test]
+    fn part2() {
+        let input = "..#
+#..
+...
+";
+        assert_eq!(26, count_infected_advanced(input, 100));
+        assert_eq!(2_511_944, count_infected_advanced(input, 10_000_000));
     }
 }
