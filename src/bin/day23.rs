@@ -5,11 +5,13 @@ use std::str::FromStr;
 
 fn main() {
     let contents = rusty_the_reindeer::get_input().expect("Must provide valid input path");
-    let part1 = execute(contents.trim());
+    let part1 = execute_debug(contents.trim());
     println!("Part 1: {}", part1);
+    let part2 = execute(contents.trim());
+    println!("Part 2: {}", part2);
 }
 
-fn execute(contents: &str) -> usize {
+fn execute_debug(contents: &str) -> usize {
     let instructions: Vec<_> = contents
         .lines()
         .map(Instruction::from_str)
@@ -29,6 +31,28 @@ fn process(instructions: &[Instruction]) -> Process {
         registers: Registers::new(),
         instructions,
         position: 0,
+    }
+}
+
+fn execute(contents: &str) -> i64 {
+    let instructions: Vec<_> = contents
+        .lines()
+        .map(Instruction::from_str)
+        .map(Result::unwrap)
+        .collect();
+
+    let mut context = Registers::new();
+    context.insert('a', 1);
+    let mut process = process_with_context(&instructions, context);
+    while let Some(_) = process.next() {}
+    process.registers.get(&'h').cloned().unwrap_or(0)
+}
+
+fn process_with_context(instructions: &[Instruction], registers: Registers) -> Process {
+    Process {
+        registers,
+        instructions,
+        position: 0
     }
 }
 
@@ -195,6 +219,6 @@ jnz g 2
 jnz 1 3
 sub b -17
 jnz 1 -23";
-        assert_eq!(4225, execute(input));
+        assert_eq!(4225, execute_debug(input));
     }
 }
