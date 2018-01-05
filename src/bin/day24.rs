@@ -6,13 +6,34 @@ use std::collections::HashSet;
 
 fn main() {
     let contents = rusty_the_reindeer::get_input().expect("Must provide valid input path");
-    let part1 = max_strength(&contents);
+    let bridges = possible_bridges(&contents);
+
+    let part1 = strongest_bridge(&bridges);
     println!("Part 1: {}", part1);
+
+    let part2 = longest_bridge(&bridges);
+    println!("Part 2: {}", part2);
 }
 
-fn max_strength(contents: &str) -> usize {
+fn possible_bridges(contents: &str) -> Vec<(usize, usize)> {
     let graph = Graph::from_str(contents).unwrap();
-    graph.strongest_path()
+    graph.all_bridges()
+}
+
+fn strongest_bridge(bridges: &[(usize, usize)]) -> usize {
+    bridges
+        .iter()
+        .map(|&(_, strength)| strength)
+        .max()
+        .unwrap_or(0)
+}
+
+fn longest_bridge(bridges: &[(usize, usize)]) -> usize {
+    bridges
+        .iter()
+        .max()
+        .map(|&(_, strength)| strength)
+        .unwrap_or(0)
 }
 
 struct Graph {
@@ -73,23 +94,30 @@ impl FromStr for Graph {
 }
 
 impl Graph {
-    pub fn strongest_path(&self) -> usize {
+    pub fn all_bridges(&self) -> Vec<(usize, usize)> {
         let mut visited = HashSet::new();
-        self.search(0, &mut visited, 0)
+        self.search(0, &mut visited, 0, 0)
     }
 
-    fn search(&self, node: usize, visited: &mut HashSet<usize>, strength: usize) -> usize {
+    fn search(
+        &self,
+        node: usize,
+        visited: &mut HashSet<usize>,
+        length: usize,
+        strength: usize,
+    ) -> Vec<(usize, usize)> {
+        let new_length = length + 1;
         let new_strength = self.nodes[node].strength() + strength;
-        let mut max = new_strength;
+        let mut bridges = vec![(new_length, new_strength)];
 
         visited.insert(self.nodes[node].id);
         for next_node in &self.nodes[node].edges {
             if !visited.contains(&self.nodes[*next_node].id) {
-                max = max.max(self.search(*next_node, visited, new_strength));
+                bridges.append(&mut self.search(*next_node, visited, new_length, new_strength));
             }
         }
         visited.remove(&self.nodes[node].id);
-        max
+        bridges
     }
 }
 
@@ -126,6 +154,21 @@ mod day24_tests {
 0/1
 10/1
 9/10";
-        assert_eq!(31, max_strength(input));
+        let bridges = possible_bridges(input);
+        assert_eq!(31, strongest_bridge(&bridges));
+    }
+
+    #[test]
+    fn part2() {
+        let input = "0/2
+2/2
+2/3
+3/4
+3/5
+0/1
+10/1
+9/10";
+        let bridges = possible_bridges(input);
+        assert_eq!(19, longest_bridge(&bridges));
     }
 }
