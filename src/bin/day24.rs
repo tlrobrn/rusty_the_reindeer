@@ -1,6 +1,5 @@
 extern crate rusty_the_reindeer;
 
-use std::fmt;
 use std::str::FromStr;
 use std::collections::HashSet;
 
@@ -126,12 +125,6 @@ struct Node {
     accepts: usize,
     outputs: usize,
     edges: Vec<usize>,
-}
-
-impl fmt::Display for Node {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[{}]: -> {}/{} ->", self.id, self.accepts, self.outputs)
-    }
 }
 
 impl Node {
