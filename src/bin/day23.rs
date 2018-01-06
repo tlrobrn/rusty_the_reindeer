@@ -1,3 +1,4 @@
+#![feature(iterator_step_by)]
 extern crate rusty_the_reindeer;
 
 use std::collections::HashMap;
@@ -7,7 +8,7 @@ fn main() {
     let contents = rusty_the_reindeer::get_input().expect("Must provide valid input path");
     let part1 = execute_debug(contents.trim());
     println!("Part 1: {}", part1);
-    let part2 = execute(contents.trim());
+    let part2 = execute();
     println!("Part 2: {}", part2);
 }
 
@@ -34,26 +35,26 @@ fn process(instructions: &[Instruction]) -> Process {
     }
 }
 
-fn execute(contents: &str) -> i64 {
-    let instructions: Vec<_> = contents
-        .lines()
-        .map(Instruction::from_str)
-        .map(Result::unwrap)
-        .collect();
+fn execute() -> usize {
+    let mut b = 67;
+    b *= 100;
+    b += 100_000;
+    let mut c = b;
+    c += 17_000;
 
-    let mut context = Registers::new();
-    context.insert('a', 1);
-    let mut process = process_with_context(&instructions, context);
-    while let Some(_) = process.next() {}
-    process.registers.get(&'h').cloned().unwrap_or(0)
+    (b..(c + 1)).step_by(17).filter(is_not_prime).count()
 }
 
-fn process_with_context(instructions: &[Instruction], registers: Registers) -> Process {
-    Process {
-        registers,
-        instructions,
-        position: 0,
+fn is_not_prime(n: &usize) -> bool {
+    let mut i = 2;
+    while i * i < *n {
+        if n % i == 0 {
+            return true;
+        }
+        i += 1;
     }
+
+    false
 }
 
 struct Process<'a> {
